@@ -1,0 +1,3 @@
+[![Build Status](https://travis-ci.org/francis94c/jsonp.svg?branch=master)](https://travis-ci.org/francis94c/jsonp) [![Coverage Status](https://coveralls.io/repos/github/francis94c/jsonp/badge.svg?branch=master)](https://coveralls.io/github/francis94c/jsonp?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/b335cb88f72a493080c0/maintainability)](https://codeclimate.com/github/francis94c/jsonp/maintainability) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/francis94c/jsonp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/francis94c/jsonp/?branch=master)
+
+#JSONP
