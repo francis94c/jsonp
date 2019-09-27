@@ -43,7 +43,7 @@ class JSONP
    */
   public function set(string $path, $value):void
   {
-    $this->run_path($path);
+    $this->run_json_path($path);
     $this->buffer = $value;
   }
   /**
@@ -53,14 +53,14 @@ class JSONP
    */
   public function get(string $path)
   {
-    $this->run_path($path);
+    $this->run_json_path($path);
     return $this->buffer;
   }
   /**
    * [run_path description]
    * @param string $path [description]
    */
-  private function run_path(string $path):void
+  private function run_json_path(string $path):void
   {
     $this->buffer =& $this->data;
     $steps = explode('.', $path);
