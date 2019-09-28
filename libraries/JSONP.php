@@ -7,6 +7,8 @@ class JSONP
 
   private $data = null;
   private $buffer = null;
+  private $pool = null;
+  private $poolKey = null;
 
   const FIELD_REGEX = "/\w+/";
   const ARRAY_REGEX = "/^\w+\[/";
@@ -31,7 +33,7 @@ class JSONP
     }
     if (is_array($data)) {
       $this->data =& $data;
-      var_dump($this->data);
+      //var_dump($this->data);
       return true;
     }
     return false;
@@ -54,6 +56,38 @@ class JSONP
   public function get(string $path)
   {
     $this->run_json_path($path);
+
+    if ($this->pool == null) return $this->buffer;
+
+    if ($this->poolKey == null) return $this->pool;
+
+    if (is_scalar($this->poolKey)) {
+      $values = [];
+      $this->recursive_scalar_key_build($values, $this->pool);
+      return $values;
+    }
+
+    // TODO: Recursive Array Key Build.
+  }
+  private function recursive_scalar_key_build(array &$values, &$pool):void
+  {
+    if (isset($pool[$this->poolKey])) {
+      $values[] = $pool[$this->poolKey];
+    }
+    for ($x = 0; $x < count($pool); $x++) {
+      if (is_array($pool[array_keys($pool)[$x]])) {
+        $this->recursive_scalar_key_build($values, $pool[array_keys($pool)[$x]]);
+      }
+    }
+  }
+  /**
+   * [get_reference description]
+   * @param  string $path [description]
+   * @return [type]       [description]
+   */
+  public function &get_reference(string $path)
+  {
+    $this->run_json_path($path);
     return $this->buffer;
   }
   /**
@@ -63,6 +97,9 @@ class JSONP
   private function run_json_path(string $path):void
   {
     $this->buffer =& $this->data;
+    unset($this->pool);
+    $this->pool = null;
+    $this->poolKey = null;
     $steps = explode('.', $path);
     foreach ($steps as $loopIndex => $step) {
       switch ($step) {
@@ -71,17 +108,29 @@ class JSONP
           continue;
         default:
           if ($this->exact_match(self::FIELD_REGEX, $step)) {
-            $this->buffer =& $this->buffer[$step];
+            if ($this->pool == null) {
+              $this->buffer =& $this->buffer[$step];
+            } else {
+              $this->poolKey = $step;
+            }
             if ($loopIndex == count($steps) - 1) { break; } else { continue; }
           }
           if (preg_match(self::ARRAY_REGEX, $step)) {
             if (preg_match(self::SPECIFIC_ARRAY_REGEX, $step)) {
               list($key, $index) = $this->parse_specific_array_notation($step);
-              $this->buffer =& $this->buffer[$key][$index];
+              if ($this->pool == null) {
+                $this->buffer =& $this->buffer[$key][$index];
+              } else {
+                $this->poolKey = [$key, $index];
+              }
+              if ($loopIndex == count($steps) - 1) { break; } else { continue; }
+            }
+            if ($step == '[*]' || $step == '*') {
+              $this->pool =& $this->buffer[$this->get_key_from_notation($step)];
               if ($loopIndex == count($steps) - 1) { break; } else { continue; }
             }
             if (preg_match(self::ALL_ARRAY_REGEX, $step)) {
-              $this->buffer =& $this->buffer[$this->get_key_from_notation($step)];
+              $this->pool =& $this->buffer[$this->get_key_from_notation($step)];
               if ($loopIndex == count($steps) - 1) { break; } else { continue; }
             }
           }
