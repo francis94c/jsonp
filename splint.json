@@ -1,0 +1,21 @@
+{
+  "name": "francis94c/jsonp",
+  "type": "library",
+  "description": "JSON Path Library for Code Igniter.",
+  "tags": [],
+  "page": "https://francis94c.github.io/jsonp",
+  "authors": [
+    {
+      "name": "Francis Ilechukwu",
+      "email": "francis94c@gmail.com",
+      "page": "francis94c.github.io",
+      "role": "Developer"
+    }
+  ],
+  "php": ">=7.3",
+  "autoload": {
+    "libraries" : [
+      ["JSONP", "jsonp"]
+    ]
+  }
+}
